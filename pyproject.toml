@@ -1,0 +1,20 @@
+[project]
+name = "weather-rest-api-to-json-dashboard"
+version = "0.1.0"
+description = "Fetches 7-day weather forecasts from the Open-Meteo API and keeps a JSON/CSV history with a static HTML dashboard"
+readme = "README.md"
+authors = [
+    { name = "Gaby-projects" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "requests>=2.34.2",
+    "truststore>=0.10.4",
+]
+
+[project.scripts]
+weather-rest-api-to-json-dashboard = "weather_rest_api_to_json_dashboard:main"
+
+[build-system]
+requires = ["uv_build>=0.12.10,<0.13.0"]
+build-backend = "uv_build"

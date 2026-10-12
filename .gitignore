@@ -1,0 +1,22 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Lint cache
+.ruff_cache/
+
+# Generated output (recreated on every run)
+weather_history.json
+weather_history.csv
+dashboard.html
+
+# Claude Code: project notes and local settings
+CLAUDE.md
+.claude/
