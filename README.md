@@ -1,57 +1,48 @@
-# Weather REST API to JSON Dashboard
+# ⛅ Weather REST API to JSON Dashboard
 
-A small Python script that fetches the 7-day weather forecast for five cities from the
-[Open-Meteo](https://open-meteo.com/) API (no API key required) and keeps an accumulating
-history of every forecast it has fetched, exported as JSON, CSV and a static HTML dashboard.
+**A small ETL pipeline: weather API → clean history → KPI dashboard.**
+
+A Python script that fetches the 7-day forecast for five cities from the [Open-Meteo](https://open-meteo.com/) API, adds it to a growing history in JSON and CSV, and builds a static HTML dashboard with KPIs per city.
+
+## 📸 Dashboard
 
 ![Weather forecast dashboard: KPI cards and a 7-day table per city](pics/dashboard.png)
 
-## Features
+## ✨ Features
 
-- **Forecast history:** every run appends to the history instead of overwriting it, so you can
-  compare how forecasts for the same day change over time.
-- **Three outputs per run:** `weather_history.json`, `weather_history.csv` (for Excel/Sheets or
-  pandas) and `dashboard.html`.
-- **Static dashboard:** KPI cards per city (average max/min temperature, total precipitation,
-  rainiest day) and a 7-day table, built from the latest fetch. Open it by double-clicking: no
-  server or internet connection needed.
-- **Works behind TLS-inspecting software:** uses the OS certificate store (`truststore`), so
-  HTTPS requests don't fail when an antivirus or proxy injects its own root certificate.
+- **Extract:** 7-day forecast (max/min temperature, precipitation, weather code) for Buenos Aires, Madrid, Mexico City, Bogotá and Santiago.
+- **Transform:** turns the API's column-based JSON into one clean record per city and day; missing values are kept as `null`.
+- **Load:** every run is added to the history instead of overwriting it, so you can see how the forecast for the same day changes over time.
+- **Outputs:** `weather_history.json`, `weather_history.csv` (ready for Excel or pandas) and `dashboard.html`.
+- **Dashboard:** KPI cards per city (average max/min temperature, total precipitation, rainiest day) and a 7-day table. Opens with a double-click, no server needed, and works on mobile.
+- **Tested:** pytest suite, run automatically by GitHub Actions on every push.
 
-## Cities
+## 🛠️ Tech stack
 
-| City | Latitude | Longitude |
-|---|---|---|
-| Buenos Aires | -34.6037 | -58.3816 |
-| Madrid | 40.4168 | -3.7038 |
-| Mexico City | 19.4326 | -99.1332 |
-| Bogotá | 4.7110 | -74.0721 |
-| Santiago | -33.4489 | -70.6693 |
+- Python
+- REST APIs · JSON · CSV
+- ETL pipeline
+- HTML/CSS dashboard
+- pytest · GitHub Actions (CI)
 
-## Setup
+## ⚡ Run locally
 
-Requires [`uv`](https://docs.astral.sh/uv/) and Python >= 3.14 (uv installs it if needed).
+Requirements: [uv](https://docs.astral.sh/uv/) (installs Python and all dependencies).
 
 ```bash
 uv sync
+uv run python -m weather_rest_api_to_json_dashboard
 ```
 
-## Usage
+Each run prints a 7-day summary per city and writes the three output files to the current folder.
 
-```bash
-uv run weather-rest-api-to-json-dashboard
-```
+## 📄 Output format
 
-Each run prints a 7-day summary per city to the console and writes the three output files to
-the current directory (they are created on the first run).
-
-## Output format
-
-Each record in `weather_history.json` (and each row in `weather_history.csv`) looks like:
+One record per city and day:
 
 ```json
 {
-  "fetched_at": "2026-09-07T13:23:17.067568+00:00",
+  "fetched_at": "2026-09-07T13:23:17+00:00",
   "city": "Madrid",
   "date": "2026-09-07",
   "temp_max": 36.4,
@@ -61,16 +52,11 @@ Each record in `weather_history.json` (and each row in `weather_history.csv`) lo
 }
 ```
 
-- `fetched_at`: when the forecast was fetched (UTC).
-- `date`: the forecast day, in the city's local time zone.
-- `temp_max` / `temp_min`: °C. `precipitation`: daily total in mm.
-- `weathercode`: [WMO weather code](https://open-meteo.com/en/docs#weather_variable_documentation).
+Temperatures in °C, precipitation in mm. `weathercode` follows the [WMO weather codes](https://open-meteo.com/en/docs#weather_variable_documentation).
 
-## Project structure
+## 📁 Project structure
 
-```
-src/weather_rest_api_to_json_dashboard/
-├── __init__.py   # fetch from Open-Meteo, build records, save JSON/CSV, main()
-├── __main__.py   # allows `python -m weather_rest_api_to_json_dashboard`
-└── dashboard.py  # renders the static HTML dashboard
-```
+- `src/weather_rest_api_to_json_dashboard/__init__.py` — fetch from the API, build records, save JSON/CSV
+- `src/weather_rest_api_to_json_dashboard/dashboard.py` — builds the HTML dashboard
+- `tests/` — pytest suite
+- `.github/workflows/` — CI: ruff + pytest
